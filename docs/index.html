@@ -80,8 +80,11 @@
   thead th.sticky-fav, thead th.sticky-addr { background: var(--marigold); z-index: 3; }
   a.listing-link { color: var(--magenta); text-decoration: none; font-weight: 600; }
   a.listing-link:hover { text-decoration: underline; color: var(--pink); }
-  .map-pin { text-decoration: none; margin-left: 4px; font-size: 13px; opacity: 0.8; }
-  .map-pin:hover { opacity: 1; }
+  .map-link {
+    display: block; text-decoration: none; font-size: 12px; margin-top: 3px;
+    color: var(--teal); font-weight: 600;
+  }
+  .map-link:hover { text-decoration: underline; color: var(--green); }
   .badge {
     display: inline-block; font-size: 11px; padding: 2px 6px; border-radius: 4px;
     background: var(--teal); color: #fff; margin-left: 6px;
@@ -208,7 +211,7 @@ function commitComment() { saveComments(); }
 const COLUMNS = [
   { key: 'favorite', label: '★', sticky: 'fav', sortable: true,
     render: (v, row) => `<button type="button" class="fav-btn${favorites.has(row.booli_id) ? ' is-fav' : ''}" onclick="toggleFavorite('${row.booli_id}', this)">${favorites.has(row.booli_id) ? '★' : '☆'}</button>` },
-  { key: 'street_address', label: 'Address', sticky: 'addr', render: (v, row) => `<a class="listing-link" href="${row.url}" target="_blank" rel="noopener">${v || '—'}</a><a class="map-pin" href="${mapsUrl(row)}" target="_blank" rel="noopener" title="View on Google Maps" onclick="event.stopPropagation()">📍</a>${row.upcoming_sale ? '<span class="badge">Upcoming</span>' : ''}` },
+  { key: 'street_address', label: 'Address', sticky: 'addr', render: (v, row) => `<a class="listing-link" href="${row.url}" target="_blank" rel="noopener">${v || '—'}</a>${row.upcoming_sale ? '<span class="badge">Upcoming</span>' : ''}<a class="map-link" href="${mapsUrl(row)}" target="_blank" rel="noopener">Show on map</a>` },
   { key: 'area', label: 'Area' },
   { key: 'rooms_sort', label: 'Rooms', numeric: true, render: (v) => v != null ? v : '—' },
   { key: 'size_sort', label: 'Size', numeric: true, render: (v) => v != null ? v + ' m²' : '—' },
