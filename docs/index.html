@@ -257,11 +257,15 @@ function renderHeader() {
   });
 }
 
+function thumbUrl(fullUrl) {
+  return fullUrl.replace(/_\d+x0(\.\w+)$/, '_300x0$1');
+}
+
 function galleryHtml(row) {
   if (!row.photos || row.photos.length === 0) {
     return '<div class="gallery-empty">No photos fetched — see listing</div>';
   }
-  return `<div class="gallery">${row.photos.map(p => `<img src="${p}" loading="lazy" onclick="openLightbox('${p}')">`).join('')}</div>`;
+  return `<div class="gallery">${row.photos.map(p => `<img src="${thumbUrl(p)}" loading="lazy" decoding="async" onclick="openLightbox('${p}')">`).join('')}</div>`;
 }
 
 function openLightbox(src) {
