@@ -108,16 +108,9 @@
   .lightbox.open { display: flex; }
   .lightbox img { max-width: 92vw; max-height: 92vh; border-radius: 4px; }
   .num { text-align: right; font-variant-numeric: tabular-nums; }
-  .pagination {
-    display: flex; align-items: center; gap: 10px; justify-content: center;
-    margin-top: 14px; font-size: 13px; color: var(--text-dim);
+  .load-status {
+    text-align: center; margin-top: 14px; font-size: 13px; color: var(--text-dim);
   }
-  .pagination button {
-    padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;
-    background: var(--panel); color: var(--text); cursor: pointer; font-size: 13px;
-  }
-  .pagination button:hover:not(:disabled) { background: var(--accent-dim); border-color: var(--magenta); }
-  .pagination button:disabled { opacity: 0.4; cursor: default; }
   .stripe {
     height: 6px; border-radius: 3px; margin-bottom: 16px;
     background: repeating-linear-gradient(90deg,
@@ -138,8 +131,6 @@
     .gallery { height: 130px; }
     .gallery img { height: 130px; }
     .comment-input { width: 180px; }
-    .pagination { flex-wrap: wrap; }
-    .pagination button { padding: 9px 16px; }
   }
 </style>
 </head>
@@ -154,7 +145,7 @@
   <span class="count" id="count"></span>
 </div>
 
-<div class="table-scroll">
+<div class="table-scroll" id="tableScroll">
 <table id="table">
   <thead>
     <tr id="headerRow"></tr>
@@ -163,7 +154,7 @@
 </table>
 </div>
 
-<div class="pagination" id="pagination"></div>
+<div class="load-status" id="loadStatus"></div>
 
 <div class="lightbox" id="lightbox">
   <img id="lightboxImg" src="" alt="">
@@ -226,8 +217,9 @@ let listings = [];
 let sortKey = 'published';
 let sortDir = -1;
 let favOnly = false;
-let currentPage = 0;
-const PAGE_SIZE = 50;
+let visibleCount = 50;
+let filteredCount = 0;
+const CHUNK_SIZE = 50;
 
 function numFromText(text) {
   if (!text) return null;
@@ -266,8 +258,9 @@ function renderHeader() {
     th.addEventListener('click', () => {
       if (sortKey === col.key) sortDir *= -1;
       else { sortKey = col.key; sortDir = (col.key === 'published' || col.key === 'favorite') ? -1 : 1; }
-      currentPage = 0;
+      visibleCount = CHUNK_SIZE;
       render();
+      document.getElementById('tableScroll').scrollTop = 0;
     });
     tr.appendChild(th);
   });
@@ -311,31 +304,16 @@ function render() {
     return (av - bv) * sortDir;
   });
 
-  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
-  if (currentPage >= totalPages) currentPage = totalPages - 1;
-  if (currentPage < 0) currentPage = 0;
-  const start = currentPage * PAGE_SIZE;
-  const pageRows = rows.slice(start, start + PAGE_SIZE);
+  if (visibleCount > rows.length) visibleCount = Math.max(CHUNK_SIZE, rows.length);
+  filteredCount = rows.length;
+  const pageRows = rows.slice(0, visibleCount);
 
   document.getElementById('count').textContent = rows.length
-    ? `${start + 1}-${Math.min(start + PAGE_SIZE, rows.length)} of ${rows.length} apartments`
+    ? `${pageRows.length} of ${rows.length} apartments`
     : `0 of ${listings.length} apartments`;
 
-  const pag = document.getElementById('pagination');
-  pag.innerHTML = '';
-  if (totalPages > 1) {
-    const prev = document.createElement('button');
-    prev.textContent = '← Previous';
-    prev.disabled = currentPage === 0;
-    prev.addEventListener('click', () => { currentPage--; render(); window.scrollTo({top: 0, behavior: 'smooth'}); });
-    const label = document.createElement('span');
-    label.textContent = `Page ${currentPage + 1} of ${totalPages}`;
-    const next = document.createElement('button');
-    next.textContent = 'Next →';
-    next.disabled = currentPage >= totalPages - 1;
-    next.addEventListener('click', () => { currentPage++; render(); window.scrollTo({top: 0, behavior: 'smooth'}); });
-    pag.append(prev, label, next);
-  }
+  document.getElementById('loadStatus').textContent =
+    pageRows.length < rows.length ? 'Scroll for more ↓' : (rows.length ? 'All apartments loaded' : '');
 
   pageRows.forEach(row => {
     const tr = document.createElement('tr');
@@ -353,9 +331,19 @@ function render() {
 
 document.getElementById('favOnly').addEventListener('change', e => {
   favOnly = e.target.checked;
-  currentPage = 0;
+  visibleCount = CHUNK_SIZE;
   render();
 });
+
+const tableScrollEl = document.getElementById('tableScroll');
+tableScrollEl.addEventListener('scroll', () => {
+  const nearBottom = tableScrollEl.scrollTop + tableScrollEl.clientHeight >= tableScrollEl.scrollHeight - 200;
+  if (nearBottom && visibleCount < filteredCount) {
+    visibleCount += CHUNK_SIZE;
+    render();
+  }
+});
+
 fetch('data/listings.json?t=' + Date.now())
   .then(r => r.json())
   .then(data => {
