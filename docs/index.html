@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LISTINGS FOR LINDA</title>
 <style>
   :root {
@@ -124,6 +125,56 @@
       var(--green) 24% 32%, var(--teal) 32% 40%, var(--periwinkle) 40% 48%,
       var(--magenta) 48% 56%, var(--pink) 56% 64%, var(--orange) 64% 72%,
       var(--marigold) 72% 80%, var(--green) 80% 88%, var(--teal) 88% 96%, var(--periwinkle) 96% 100%);
+  }
+
+  /* --- Mobile: turn each row into a stacked card instead of a scrolling table --- */
+  @media (max-width: 700px) {
+    body { padding: 14px; }
+    h1 { font-size: 26px; }
+    .controls { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .count { margin-left: 0; }
+
+    .table-scroll { overflow-x: hidden; max-height: none; border: none; background: transparent; }
+    table { white-space: normal; }
+    thead { display: none; }
+
+    tbody tr {
+      display: flex; flex-direction: column;
+      background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 14px; margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    tbody tr:hover td { background: transparent; }
+
+    td {
+      display: block; width: 100% !important; padding: 5px 0; border-bottom: none;
+      white-space: normal;
+    }
+    td[data-label]::before {
+      content: attr(data-label) ": "; display: block; margin-bottom: 1px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    td[data-label="★"]::before,
+    td[data-label="Address"]::before,
+    td[data-label="Photos"]::before { content: none; }
+
+    .sticky-col, td.sticky-fav, td.sticky-addr {
+      position: static; left: auto; box-shadow: none; border-right: none;
+      background: transparent; text-align: left;
+    }
+    td.gallery-cell { order: -3; padding: 0 0 10px; }
+    td.sticky-addr { order: -2; font-size: 15px; padding-top: 0; }
+    td.sticky-fav { order: -1; padding: 0 0 4px; }
+    .fav-btn { font-size: 24px; padding: 0; }
+
+    .gallery { width: 100%; height: 140px; }
+    .gallery img { height: 140px; }
+
+    .comment-input { width: 100%; }
+    .num { text-align: left; }
+
+    .pagination { flex-wrap: wrap; }
   }
 </style>
 </head>
@@ -324,11 +375,12 @@ function render() {
   pageRows.forEach(row => {
     const tr = document.createElement('tr');
     tr.innerHTML = COLUMNS.map(col => {
-      if (col.gallery) return `<td class="gallery-cell">${galleryHtml(row)}</td>`;
+      const label = escapeAttr(col.label);
+      if (col.gallery) return `<td class="gallery-cell" data-label="${label}">${galleryHtml(row)}</td>`;
       const val = row[col.key];
       const rendered = col.render ? col.render(val, row) : (val ?? '—');
       const classes = [col.numeric ? 'num' : '', col.sticky ? 'sticky-col sticky-' + col.sticky : ''].filter(Boolean).join(' ');
-      return `<td class="${classes}">${rendered}</td>`;
+      return `<td class="${classes}" data-label="${label}">${rendered}</td>`;
     }).join('');
     tbody.appendChild(tr);
   });
