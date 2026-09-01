@@ -66,8 +66,14 @@
   thead th.sorted { color: var(--magenta); }
   thead th .arrow { font-size: 10px; margin-left: 3px; opacity: 0.8; }
   tbody tr:hover td { background: var(--row-hover); }
+  tbody tr:hover td.sticky-fav { background: var(--row-hover); }
   td { padding: 8px 12px; vertical-align: middle; border-bottom: 1px solid var(--border); }
-  .sticky-fav { width: 40px; text-align: center; padding: 8px 4px; }
+  .sticky-fav {
+    width: 40px; text-align: center; padding: 8px 4px;
+    position: sticky; left: 0; background: var(--panel); z-index: 1;
+    box-shadow: 1px 0 0 0 var(--orange);
+  }
+  thead th.sticky-fav { background: var(--marigold); z-index: 3; }
   .sticky-addr {
     max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
@@ -127,6 +133,7 @@
     table { font-size: 15px; }
     thead th { padding: 12px 14px; }
     td { padding: 10px 14px; }
+    .sticky-fav { position: static; left: auto; box-shadow: none; }
     .fav-btn { font-size: 22px; }
     .gallery { height: 130px; }
     .gallery img { height: 130px; }
