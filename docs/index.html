@@ -67,10 +67,10 @@
   thead th .arrow { font-size: 10px; margin-left: 3px; opacity: 0.8; }
   tbody tr:hover td { background: var(--row-hover); }
   td { padding: 8px 12px; vertical-align: middle; border-bottom: 1px solid var(--border); }
-  .sticky-col { position: sticky; background: var(--panel); }
-  .sticky-fav { left: 0; width: 40px; text-align: center; padding: 8px 4px; }
-  .sticky-addr { left: 40px; border-right: 1px solid var(--orange); }
-  thead th.sticky-col { background: var(--marigold); z-index: 3; }
+  .sticky-fav { width: 40px; text-align: center; padding: 8px 4px; }
+  .sticky-addr {
+    max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
   a.listing-link { color: var(--magenta); text-decoration: none; font-weight: 600; }
   a.listing-link:hover { text-decoration: underline; color: var(--pink); }
   .map-pin { text-decoration: none; margin-left: 4px; font-size: 13px; opacity: 0.8; }
