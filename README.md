@@ -23,24 +23,37 @@ them in a sortable table with photo galleries, favorites, and comments.
 
 ## Current search criteria
 
-Apartments (`Lägenhet`), 2–3 rooms, within **3.5 km** of Malmö Central Station
-(55.60906, 13.00074), municipality areaId `78`. Change these via CLI flags on
-the scraper (see `--help`), or edit the defaults in `scrape_booli.py`.
+- Apartments (`Lägenhet`), 2–3 rooms, within **3.5 km** of Malmö Central Station
+  (55.60906, 13.00074), municipality areaId `78`.
+- Price between **1,000,000 and 3,000,000 kr**.
+- Monthly fee (avgift) at most **4,600 kr/month**.
+- Excludes the neighborhoods **Rosengård, Lindängen, and Kirseberg**.
+- Excludes listings where the housing cooperative holds the land via
+  **tomträtt** (site leasehold) rather than owning it outright. Booli doesn't
+  expose this in its normal listing data — the scraper gets it by clicking
+  the real "Föreningen" tab on each listing's detail page (a direct API call
+  to that same endpoint gets 403'd by Cloudflare even from a genuine
+  Playwright session, so it has to be a real UI interaction). When Booli has
+  no plot-status info for a listing at all, it's kept (unverified, not
+  assumed to fail the check).
+
+Change any of these via CLI flags on the scraper (see `--help`), or edit the
+defaults in `scrape_booli.py`.
 
 ## Re-running the scraper
 
 ```bash
 cd scraper
-python3 scrape_booli.py --radius-km 3.5 --max-detail 60 --delay 1.5 --out ../data/listings.json
+python3 scrape_booli.py --delay 1.5 --out ../data/listings.json
 ```
 
-- `--max-detail N` controls how many of the newest listings get their *full*
-  photo gallery (search results only include up to 5 photos each; full
-  galleries require an extra page load per listing, so this is capped to keep
-  the scrape light).
-- Takes a few minutes — it has to page through every matching listing in
-  Malmö kommun before filtering by radius, since Booli only filters by
-  municipality, not by an arbitrary point.
+- Because the fee and tomträtt checks both require visiting each listing's
+  detail page, the scraper now detail-fetches **every** listing that passes
+  the cheap filters (radius/price/area) rather than just the newest N — pass
+  `--max-detail N` to cap that for a faster/smaller test run.
+- Takes a while (~30-45 min for the full run) — it has to page through every
+  matching listing in Malmö kommun first (Booli only filters by municipality,
+  not by an arbitrary point or price), then visit each survivor's detail page.
 - Needs Playwright installed (`pip install playwright && playwright install chromium`).
 
 ## Testing locally
@@ -80,3 +93,5 @@ GitHub Pages rebuilds automatically after a push (usually live within
   browser/device — they don't sync between people or devices.
 - "Distance" in the data is straight-line (as-the-crow-flies) from Malmö C,
   not driving/walking distance.
+- The UI (`webapp/index.html`) is in **Spanish**. Numbers/currency use
+  `es-ES` locale formatting (period as thousand separator).
