@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LISTINGS FOR LINDA</title>
+<title>LISTADOS PARA LINDA</title>
 <style>
   :root {
     /* Mexican folklore palette: serape pink, periwinkle, marigold, teal, magenta, orange, green */
@@ -155,14 +155,14 @@
 <body>
 
 <div class="header-row">
-  <h1>LISTINGS FOR LINDA</h1>
+  <h1>LISTADOS PARA LINDA</h1>
   <img class="header-photo" src="assets/linda-header.png" alt="Linda">
 </div>
 <div class="stripe"></div>
-<div class="subtitle" id="subtitle">Loading…</div>
+<div class="subtitle" id="subtitle">Cargando…</div>
 
 <div class="controls">
-  <label class="fav-filter"><input type="checkbox" id="favOnly"> Show favorites only</label>
+  <label class="fav-filter"><input type="checkbox" id="favOnly"> Mostrar solo favoritos</label>
   <span class="count" id="count"></span>
 </div>
 
@@ -221,17 +221,17 @@ function commitComment() { saveComments(); }
 const COLUMNS = [
   { key: 'favorite', label: '★', sticky: 'fav', sortable: true,
     render: (v, row) => `<button type="button" class="fav-btn${favorites.has(row.booli_id) ? ' is-fav' : ''}" onclick="toggleFavorite('${row.booli_id}', this)">${favorites.has(row.booli_id) ? '★' : '☆'}</button>` },
-  { key: 'street_address', label: 'Address', sticky: 'addr', render: (v, row) => `<a class="listing-link" href="${row.url}" target="_blank" rel="noopener">${v || '—'}</a>${row.upcoming_sale ? '<span class="badge">Upcoming</span>' : ''}<a class="map-link" href="${mapsUrl(row)}" target="_blank" rel="noopener">Show on map</a>` },
-  { key: 'area', label: 'Area' },
-  { key: 'rooms_sort', label: 'Rooms', numeric: true, render: (v) => v != null ? v : '—' },
-  { key: 'size_sort', label: 'Size', numeric: true, render: (v) => v != null ? v + ' m²' : '—' },
-  { key: 'floor_sort', label: 'Floor', numeric: true, render: (v) => v != null ? v : '—' },
-  { key: 'list_price', label: 'Price', numeric: true, render: (v) => v ? v.toLocaleString('en-US') + ' kr' : '—' },
-  { key: 'fee_sort', label: 'Fee', numeric: true, render: (v) => v != null ? v.toLocaleString('en-US') + ' kr/month' : '—' },
-  { key: 'published', label: 'Listed', render: (v) => v ? v.split(' ')[0] : '—' },
-  { key: 'comment', label: 'Comment', sortable: false,
-    render: (v, row) => `<input type="text" class="comment-input" value="${escapeAttr(comments[row.booli_id] || '')}" placeholder="Write a comment…" oninput="updateComment('${row.booli_id}', this.value)" onchange="commitComment()" onclick="event.stopPropagation()">` },
-  { key: 'photo_count', label: 'Photos', numeric: true, sortable: true, gallery: true },
+  { key: 'street_address', label: 'Dirección', sticky: 'addr', render: (v, row) => `<a class="listing-link" href="${row.url}" target="_blank" rel="noopener">${v || '—'}</a>${row.upcoming_sale ? '<span class="badge">Próximamente</span>' : ''}<a class="map-link" href="${mapsUrl(row)}" target="_blank" rel="noopener">Ver en el mapa</a>` },
+  { key: 'area', label: 'Zona' },
+  { key: 'rooms_sort', label: 'Habitaciones', numeric: true, render: (v) => v != null ? v : '—' },
+  { key: 'size_sort', label: 'Tamaño', numeric: true, render: (v) => v != null ? v + ' m²' : '—' },
+  { key: 'floor_sort', label: 'Planta', numeric: true, render: (v) => v != null ? v : '—' },
+  { key: 'list_price', label: 'Precio', numeric: true, render: (v) => v ? v.toLocaleString('es-ES') + ' kr' : '—' },
+  { key: 'fee_sort', label: 'Cuota', numeric: true, render: (v) => v != null ? v.toLocaleString('es-ES') + ' kr/mes' : '—' },
+  { key: 'published', label: 'Publicado', render: (v) => v ? v.split(' ')[0] : '—' },
+  { key: 'comment', label: 'Comentario', sortable: false,
+    render: (v, row) => `<input type="text" class="comment-input" value="${escapeAttr(comments[row.booli_id] || '')}" placeholder="Escribe un comentario…" oninput="updateComment('${row.booli_id}', this.value)" onchange="commitComment()" onclick="event.stopPropagation()">` },
+  { key: 'photo_count', label: 'Fotos', numeric: true, sortable: true, gallery: true },
 ];
 
 let listings = [];
@@ -293,7 +293,7 @@ function thumbUrl(fullUrl) {
 
 function galleryHtml(row) {
   if (!row.photos || row.photos.length === 0) {
-    return '<div class="gallery-empty">No photos fetched — see listing</div>';
+    return '<div class="gallery-empty">No se han obtenido fotos — ver el anuncio</div>';
   }
   return `<div class="gallery">${row.photos.map(p => `<img src="${thumbUrl(p)}" loading="lazy" decoding="async" onclick="openLightbox('${p}')">`).join('')}</div>`;
 }
@@ -321,7 +321,7 @@ function render() {
     if (av == null && bv == null) return 0;
     if (av == null) return 1;
     if (bv == null) return -1;
-    if (typeof av === 'string') return av.localeCompare(bv, 'en') * sortDir;
+    if (typeof av === 'string') return av.localeCompare(bv, 'es') * sortDir;
     return (av - bv) * sortDir;
   });
 
@@ -330,11 +330,11 @@ function render() {
   const pageRows = rows.slice(0, visibleCount);
 
   document.getElementById('count').textContent = rows.length
-    ? `${pageRows.length} of ${rows.length} apartments`
-    : `0 of ${listings.length} apartments`;
+    ? `${pageRows.length} de ${rows.length} apartamentos`
+    : `0 de ${listings.length} apartamentos`;
 
   document.getElementById('loadStatus').textContent =
-    pageRows.length < rows.length ? 'Scroll for more ↓' : (rows.length ? 'All apartments loaded' : '');
+    pageRows.length < rows.length ? 'Desplázate para ver más ↓' : (rows.length ? 'Todos los apartamentos cargados' : '');
 
   pageRows.forEach(row => {
     const tr = document.createElement('tr');
@@ -373,14 +373,14 @@ fetch('data/listings.json?t=' + Date.now())
     listings = prepare(rawListings);
     const withFullGallery = listings.filter(l => (l.photos || []).length > 5).length;
     const scrapedText = scrapedAt
-      ? new Date(scrapedAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
-      : 'unknown';
+      ? new Date(scrapedAt).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' })
+      : 'desconocida';
     document.getElementById('subtitle').textContent =
-      `${listings.length} apartments · ${withFullGallery} with full photo gallery · data scraped ${scrapedText}`;
+      `${listings.length} apartamentos · ${withFullGallery} con galería de fotos completa · datos extraídos el ${scrapedText}`;
     render();
   })
   .catch(err => {
-    document.getElementById('subtitle').textContent = 'Could not load data/listings.json — run the scraper first, and serve this page via a local HTTP server (not file://).';
+    document.getElementById('subtitle').textContent = 'No se pudo cargar data/listings.json — ejecuta el scraper primero, y sirve esta página con un servidor HTTP local (no file://).';
     console.error(err);
   });
 </script>
